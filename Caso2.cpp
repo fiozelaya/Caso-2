@@ -50,6 +50,7 @@ void swap(int* a, int* b)
 int partition(int arr[], int low, int high)
 {
     int pivot = arr[high];    // pivot 
+    int random = low + rand() % (high - low);
     int i = (low - 1);
 
     for (int j = low; j <= high - 1; j++)
@@ -59,11 +60,26 @@ int partition(int arr[], int low, int high)
         if (arr[j] <= pivot)
         {
             i++;    // increment index of smaller element 
+            swapCount++;
             swap(&arr[i], &arr[j]);
         }
     }
     swap(&arr[i + 1], &arr[high]);
+    swapCount++;
     return (i + 1);
+}
+
+int partition_r(int arr[], int low, int high)
+{
+    // Generate a random number in between
+    // low .. high
+    srand(time(NULL));
+    int random = low + rand() % (high - low);
+ 
+    // Swap A[random] with A[high]
+    swap(arr[random], arr[high]);
+ 
+    return partition(arr, low, high);
 }
 
 //quicksort algorithm
@@ -94,6 +110,8 @@ void quickSort(int arr[], int l, int h)
 
     // Keep popping from stack while is not empty
     while (top >= 0) {
+        iterCount++;
+
         // Pop h and l
         h = stack[top--];
         l = stack[top--];
@@ -101,6 +119,7 @@ void quickSort(int arr[], int l, int h)
         // Set pivot element at its correct position
         // in sorted array
         int p = partition(arr, l, h);
+        
 
         // If there are elements on left side of pivot,
         // then push left side to stack
@@ -119,10 +138,90 @@ void quickSort(int arr[], int l, int h)
 }
 
 
+void quickSort_r(int arr[], int l, int h, int pivote)
+{
+    // Create an auxiliary stack
+    int stack[h - l + 1];
 
-void insertion_sort(vector<int>& vector) { // loop invariant: array[0 - j-1] is always sorted
+    // initialize top of stack
+    int top = -1;
+
+    // push initial values of l and h to stack
+    stack[++top] = l;
+    stack[++top] = h;
+
+    // Keep popping from stack while is not empty
+    while (top >= 0) {
+        iterCount++;
+
+        // Pop h and l
+        h = stack[top--];
+        l = stack[top--];
+
+        // Set pivot element at its correct position
+        // in sorted array
+        int p = partition_r(arr, l, h);
+        
+
+        // If there are elements on left side of pivot,
+        // then push left side to stack
+        if (p - 1 > l) {
+            stack[++top] = l;
+            stack[++top] = p - 1;
+        }
+
+        // If there are elements on right side of pivot,
+        // then push right side to stack
+        if (p + 1 < h) {
+            stack[++top] = p + 1;
+            stack[++top] = h;
+        }
+    }
+}
+
+void fill(int arr[], int size, int sign) {
+    for (int i = 0; i < size; i++) {
+        switch (sign) {
+        case 0:
+            arr[i] = rand() % size;
+            break;
+        case 1:
+            arr[i] = i + 1;
+            break;
+        case 2:
+            arr[i] = size - i;
+        }
+    }
+}
+
+
+void pruebaQuicksort(int size, int sign){
+    int vector[size];
+    fill(vector, size, sign);
+    cout << "\nVector de " << size << " elementos: " << endl;
+    swapCount = 0;
+    double qt1 = (double)clock() / CLOCKS_PER_SEC;
+    quickSort(vector, 0, size - 1);
+    double qt2 = (double)clock() / CLOCKS_PER_SEC;
+    cout << "Tiempo: " << (qt2 - qt1) << "\nSwaps: " << swapCount << "\nComparaciones: " << compCount /*<< "Tasa de crecimiento: " << ((((qt2 - qt1))-tasa)/tasa)*100*/ << endl;
+}
+
+void pruebaQuicksort_r(int size, int sign, int pivote){
+    int vector[size];
+    fill(vector, size, sign);
+    cout << "\nVector de " << size << " elementos: " << endl;
+    swapCount = 0;
+    double qt1 = (double)clock() / CLOCKS_PER_SEC;
+    quickSort_r(vector, 0, size - 1, pivote);
+    double qt2 = (double)clock() / CLOCKS_PER_SEC;
+    cout << "Tiempo: " << (qt2 - qt1) << "\nSwaps: " << swapCount << "\nComparaciones: " << compCount /*<< "Tasa de crecimiento: " << ((((qt2 - qt1))-tasa)/tasa)*100*/ << endl;
+}
+
+
+
+void insertion_sort(int vector[], int size) { // loop invariant: array[0 - j-1] is always sorted
     int j;
-    for (int i = 1; i < vector.size(); i++) {
+    for (int i = 1; i < size; i++) {
         j = i;
         while (j != 0 && vector[j] < vector[j - 1]) {
             swap(vector[j], vector[j - 1]);
@@ -130,8 +229,19 @@ void insertion_sort(vector<int>& vector) { // loop invariant: array[0 - j-1] is 
             cRegresiones++;
         }
 
-    }
-    cout << "Cantidad de desplazamientos de dígitos: " << cRegresiones << endl;
+    }    
+}
+
+
+void pruebaInsertionSort(int size, int sign){
+    int vector[size];
+    fill(vector, size, sign);
+    cout << "\nVector de " << size << " elementos: " << endl;
+    cRegresiones = 0;
+    double it1 = (double)clock() / CLOCKS_PER_SEC;
+    insertion_sort(vector, size);
+    double it2 = (double)clock() / CLOCKS_PER_SEC;
+    cout << "Tiempo: " << (it2 - it1) << "\nRegresiones: " << cRegresiones /*<< "Tasa de crecimiento: " << ((((qt2 - qt1))-tasa)/tasa)*100*/ << endl;
 }
 
 void add(int n, int* posiciones, int index) {
@@ -196,20 +306,7 @@ int patternSearch(char* text, char* pattern, vector<pos>& posiciones, int m, int
 }
 
 
-void fill(int arr[], int size, int sign) {
-    for (int i = 0; i < size; i++) {
-        switch (sign) {
-        case 0:
-            arr[i] = rand() % size;
-            break;
-        case 1:
-            arr[i] = i + 1;
-            break;
-        case 2:
-            arr[i] = size - i;
-        }
-    }
-}
+
 
 
 int main() {
@@ -225,164 +322,102 @@ int main() {
     int vector2[size];
     int vector3[size];
 
+    double tasa = 0;
+
     fill(vector1, size, 0);
     fill(vector2, size, 2);
     fill(vector3, size, 1);
 
     cout << "Ejercicio 1: Quicksort" << endl;
-    //cout << "Caso promedio: Los elementos del array están en desorden. Tiene una complejidad en el tiempo de O(n^2)" << endl;
-    cout << "\nVector de 100 elementos" << endl;
-    
-    
-    double qt1 = clock();
-    cout << qt1 << endl;
-    quickSort(vector1, 0, size - 1);
-    double qt2 = clock();
-    cout << qt2 << endl;
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
-
-    cout << "\nVector de 1000 elementos " << endl;
-    int vector1_2[1000];
-    fill(vector1_2, 1000, 0);
-    qt1 = clock();
-    quickSort(vector1_2, 0, 1000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    cout << "Pivote fijo: último elemento" << endl;
+    cout << "Caso promedio: Los elementos del array están en desorden. Tiene una complejidad en el tiempo de O(n log n)" << endl;
 
 
-    cout << "\nVector de 10000 elementos " << endl;
-    int vector1_3[10000];
-    fill(vector1_3, 10000, 0);
-    qt1 = clock();
-    quickSort(vector1_3, 0, 10000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    pruebaQuicksort(10, 0);
+    pruebaQuicksort(100, 0);
+    pruebaQuicksort(1000, 0);
+    pruebaQuicksort(10000, 0);
+    pruebaQuicksort(50000, 0);
+    pruebaQuicksort(80000, 0);
+    pruebaQuicksort(100000, 0);
+    pruebaQuicksort(200000, 0);
 
-    cout << "\nVector de 50000 elementos " << endl;
-    int vector1_4[50000];
-    fill(vector1_4, 50000, 0);
-    qt1 = clock();
-    quickSort(vector1_4, 0, 50000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
-
-    cout << "\nVector de 100000 elementos " << endl;
-    int vector1_5[100000];
-    fill(vector1_5, 100000, 0);
-    qt1 = clock();
-    quickSort(vector1_5, 0, 100000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
-
-    // cout << "\nVector de 100000 elementos " << endl;
-    // int vector1_6[500000];
-    // fill(vector1_6, 500000, 0);
-    // qt1 = clock();
-    // quickSort(vector1_6, 0, 500000 - 1);
-    // qt2 = clock();
-    // cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    cout << "Peor caso: Los elementos del array están en ordenados ascendentemente, el pivote es un mínimo o máximo. Tiene una complejidad en el tiempo de O(n^2)" << endl;
 
 
-        //----------------------------------------------------------------------------------------
-    cout << "\nVector de 100 elementos... " << endl;
-    qt1 = clock();
-    cout << qt1 << endl;
-    quickSort(vector2, 0, size - 1);
-    qt2 = clock();
-    cout << qt2 << endl;
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
-
-    cout << "\nVector de 1000 elementos " << endl;
-    int vector2_2[1000];
-    fill(vector2_2, 1000, 2);
-    qt1 = clock();
-    quickSort(vector2_2, 0, 1000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    pruebaQuicksort(10, 2);
+    pruebaQuicksort(100, 2);
+    pruebaQuicksort(1000, 2);
+    pruebaQuicksort(10000, 2);
+    pruebaQuicksort(50000, 2);
+    pruebaQuicksort(80000, 2);
+    pruebaQuicksort(100000, 2);
+    pruebaQuicksort(200000, 2);
 
 
-    cout << "\nVector de 10000 elementos " << endl;
-    int vector2_3[10000];
-    fill(vector2_3, 10000, 2);
-    qt1 = clock();
-    quickSort(vector2_3, 0, 10000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    cout << "\nPivote aleatorio" << endl;
+    cout << "Caso promedio: Los elementos del array están en desorden. Tiene una complejidad en el tiempo de O(n log n)" << endl;
 
-    cout << "\nVector de 50000 elementos " << endl;
-    int vector2_4[50000];
-    fill(vector2_4, 50000, 2);
-    qt1 = clock();
-    quickSort(vector2_4, 0, 50000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
 
-    cout << "\nVector de 100000 elementos " << endl;
-    int vector2_5[100000];
-    fill(vector2_5, 100000, 2);
-    qt1 = clock();
-    quickSort(vector2_5, 0, 100000 - 1);
-    qt2 = clock();
-    cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    pruebaQuicksort_r(10, 0,1);
+    pruebaQuicksort_r(100, 0,1);
+    pruebaQuicksort_r(1000, 0,1);
+    pruebaQuicksort_r(10000, 0,1);
+    pruebaQuicksort_r(50000, 0,1);
+    pruebaQuicksort_r(80000, 0,1);
+    pruebaQuicksort_r(100000, 0,1);
+    pruebaQuicksort_r(200000, 0,1);
 
-    // cout << "\nVector de 500000 elementos " << endl;
-    // int vector2_6[500000];
-    // fill(vector2_6, 500000, 2);
-    // qt1 = clock();
-    // quickSort(vector2_6, 0, 500000 - 1);
-    // qt2 = clock();
-    // cout << " Tiempo: \n" << (qt2 - qt1) / 1000 << endl;
+    cout << "Peor caso: Los elementos del array están en ordenados ascendentemente, el pivote es un mínimo o máximo. Tiene una complejidad en el tiempo de O(n^2)" << endl;
+
+
+    pruebaQuicksort_r(10, 2,1);
+    pruebaQuicksort_r(100, 2,1);
+    pruebaQuicksort_r(1000, 2,1);
+    pruebaQuicksort_r(10000, 2,1);
+    pruebaQuicksort_r(50000, 2,1);
+    pruebaQuicksort_r(80000, 2,1);
+    pruebaQuicksort_r(100000, 2,1);
+    pruebaQuicksort_r(200000, 2,1);
+
 
 
     cout << "-----------------------------------------------------------------------------" << endl;
     cout << "Ejercicio 2: Insertion sort" << endl;
     cout << "Caso promedio: Los elementos del array están en desorden. Tiene una complejidad en el tiempo de O(n^2)" << endl;
-    cout << "Vector: [ 40, 20, 58, 18, 10, 60, 5 , 234, 678, 102, 987, 98, 34 , 473, 8349, 193, 13, 4395, 304, 12, 45, 23, 89  ] \n " << endl;
 
-    
+    pruebaInsertionSort(10, 0);
+    pruebaInsertionSort(100, 0);
+    pruebaInsertionSort(1000, 0);
+    pruebaInsertionSort(10000, 0);
+    pruebaInsertionSort(50000, 0);
+    pruebaInsertionSort(80000, 0);
+    pruebaInsertionSort(100000, 0);
+    pruebaInsertionSort(200000, 0);
 
-    int it1 = clock();
-    insertion_sort(vector20);
-    int it2 = clock();
-
-    cout << "Tiempo: " << it2 - it1 << endl;
-
-    for (int i = 0; i < 7; i++) {
-        cout << vector3[i] << " ";
-    }
-    cout << endl;
 
     cout << "\nPeor caso: Los elementos del array están en orden descendente y, por lo tanto en cada iteración el algoritmo debe\nrecorrer el array desde el índice i hasta 0. Tiene una complejidad en el tiempo de O(n ^ 2)" << endl;
-    cout << "Vector: [ 10000, 8000, 6000, 4000, 2000, 1000, 800, 600, 400, 200, 100, 80, 60, 40, 20,10, 8, 6, 4, 2, 1  ] \n " << endl;
 
-    
+    pruebaInsertionSort(10, 2);
+    pruebaInsertionSort(100, 2);
+    pruebaInsertionSort(1000,2);
+    pruebaInsertionSort(10000,2);
+    pruebaInsertionSort(50000,2);
+    pruebaInsertionSort(80000,2);
+    pruebaInsertionSort(100000,2);
+    pruebaInsertionSort(200000,2);
 
-    cRegresiones = 0;
-    it1 = clock();
-    insertion_sort(vector21);
-    it2 = clock();
-
-    cout << "Tiempo: " << it2 - it1 << endl;
-
-
-    for (int i = 0; i < 21; i++) {
-        cout << vector21[i] << " ";
-    }
-    cout << endl;
 
     cout << "\nMejor caso: Los elementos del array están en orden ascendente o todos son iguales, por lo tanto el algoritmo simplemente\nrecorre el array sin realizar ningún swap. Tiene una complejidad en el tiempo de O(n)" << endl;
-    cout << "Vector: [ 2, 3, 4, 5, 6, 7, 8  ] \n " << endl;
 
-    vector<int> vector31 = { 1, 2, 4, 6, 8, 10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000, 2000, 4000, 6000, 8000, 10000 };
-
-    cRegresiones = 0;
-    insertion_sort(vector31);
-
-
-    for (int i = 0; i < 21; i++) {
-        cout << vector31[i] << " ";
-    }
-    cout << endl;
+    pruebaInsertionSort(10, 1);
+    pruebaInsertionSort(100, 1);
+    pruebaInsertionSort(1000, 1);
+    pruebaInsertionSort(10000, 1);
+    pruebaInsertionSort(50000, 1);
+    pruebaInsertionSort(80000, 1);
+    pruebaInsertionSort(100000, 1);
+    pruebaInsertionSort(200000, 1);
 
 
     //-------------------------------------------------------------------------------------------------------
