@@ -29,7 +29,7 @@ de O(n^2).
 La segunda prueba se realizó con un pivote aleatorio y los mismos vectores.
 1. El primer vector que contenía elementos desordenados se comportó de forma lineal, es decir
 O(n log n). Su tasa de crecimiento aumenta en forma proporcional a la entrada. (Ver Imagen)
-2.El segundo vector ordenado en forma descendente se comportó de forma lineal, puesto que al escoger 
+2. El segundo vector ordenado en forma descendente se comportó de forma lineal, puesto que al escoger 
 un pivote random, las probabilidades de escoger un mínimo o un máximo se reducen muchísimo. De esta
 forma, se evita obtener un comportamiento cuadrático. Su tasa de crecimiento aumenta en forma
 proporcional al tamaño de la entrada. (Ver Imagen)
