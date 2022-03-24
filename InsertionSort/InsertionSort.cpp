@@ -1,5 +1,6 @@
 /*
 Caso 2
+InsertionSort
 
 Fiorella Zelaya Coto
 2021453615
@@ -15,11 +16,15 @@ Fiorella Zelaya Coto
 
 using namespace std;
 
-//insertionsort
+//globales
 int cIteraciones = 0;
 long long int cRegresiones = 0;
 
 
+/*
+Función que llena un array dependiendo del parámetro sign.
+@param: array, tamaño del array y sign (0, desordenado; 1, ordenado ascendentemente; 2, ordenado descendentemente)
+*/
 void fill(int arr[], int size, int sign) {
     for (int i = 0; i < size; i++) {
         switch (sign) {
@@ -35,6 +40,12 @@ void fill(int arr[], int size, int sign) {
     }
 }
 
+
+/*
+Insertion Sort.
+Ordena un array insertando el elemento actual en su posición correcta.
+@param: Recibe un array y el tamaño del array.
+*/
 void insertion_sort(int vector[], int size) { // loop invariant: array[0 - j-1] is always sorted
     int j;
     for (int i = 1; i < size; i++) {
@@ -49,7 +60,12 @@ void insertion_sort(int vector[], int size) { // loop invariant: array[0 - j-1] 
     }    
 }
 
-
+/*
+Función para hacer las pruebas del insertionsort. 
+Recibe el tamaño deseado del array y un sign que será 0 si el array está desordenado, 
+1 si está ordenado ascendentemente y 2 descendentemente.
+Al final imprime los stats.
+*/
 void pruebaInsertionSort(int size, int sign){
     int vector[size];
     fill(vector, size, sign);
@@ -59,12 +75,9 @@ void pruebaInsertionSort(int size, int sign){
     double it1 = (double)clock() / CLOCKS_PER_SEC;
     insertion_sort(vector, size);
     double it2 = (double)clock() / CLOCKS_PER_SEC;
-    cout << "Tiempo: " << (it2 - it1) << "\nRegresiones: " << cRegresiones << "\nIteraciones For: " << cIteraciones << "\nIteraciones totales: " << cIteraciones + cRegresiones /*<< "Tasa de crecimiento: " << ((((qt2 - qt1))-tasa)/tasa)*100*/ << endl;
+    cout << "Tiempo: " << (it2 - it1) << "\nRegresiones: " << cRegresiones << "\nIteraciones For: " << cIteraciones << "\nIteraciones totales: " << cIteraciones + cRegresiones << endl;
 }
 
-void add(int n, int* posiciones, int index) {
-    posiciones[index] = n;
-}
 
 int main(){
     cout << "-----------------------------------------------------------------------------" << endl;

@@ -1,5 +1,6 @@
 /*
 Caso 2
+Free Text Search
 
 Fiorella Zelaya Coto
 2021453615
@@ -15,14 +16,19 @@ Fiorella Zelaya Coto
 
 using namespace std;
 
-//free text
+//globales
 int prime = 10;
 
+//Struct de una posición
 struct pos {
     int linea;
     int index;
 };
 
+/*
+Función que recalcula el valor hash del elemento usando rolling hash
+@param string del patrón a calcular, el viejo index, el nuevo index, el viejo valor hash y la longitud del patrón
+*/
 long recalculateHash(char* str, int oldIndex, int newIndex, long oldHash, int patternLen) {
     long newHash = oldHash - str[oldIndex];
     newHash = newHash / prime;
@@ -30,6 +36,10 @@ long recalculateHash(char* str, int oldIndex, int newIndex, long oldHash, int pa
     return newHash;
 }
 
+/*
+Función que calcula el valor hash del patrón
+@param: string del patron, ultimo indice del string
+*/
 long createHash(char* str, int end) {
     long hash = 0;
     for (int i = 0; i <= end; i++) {
@@ -38,6 +48,11 @@ long createHash(char* str, int end) {
     return hash;
 }
 
+/*
+Función que verifica si ambos strings coindicen
+@param: string del patron, indice de inicio, indice de fin, string del string a comparar, indice de inicio, indice de fin
+@return: true si coindicen, false si no coinciden
+*/
 bool checkEqual(char str1[], int start1, int end1, char str2[], int start2, int end2) {
     if (end1 - start1 != end2 - start2) {
         return false;
@@ -52,8 +67,11 @@ bool checkEqual(char str1[], int start1, int end1, char str2[], int start2, int 
     return true;
 }
 
-
-pos createPos(vector<pos> lista, int linea, int index) {
+/*
+Función que crea un nuevo objeto Pos para guardar la linea y el indice de una palabra encontrada
+@param: linea en que se encuentra la palabra, indice de la palabra encontrada en la linea
+*/
+pos createPos(int linea, int index) {
     pos nuevo;
     nuevo.linea = linea;
     nuevo.index = index;
@@ -61,8 +79,13 @@ pos createPos(vector<pos> lista, int linea, int index) {
     return nuevo;
 }
 
-
-int patternSearch(char* text, char* pattern, vector<pos>& posiciones, int m, int n, int linea) {
+/*
+Función del algoritmo Rabin-Karp. Busca una palabra en un string.
+@param: char del texto en el que se busca, char del patrón a buscar, vector de posiciones, longitud m del texto,
+        longitud n del patron, número de línea del txt.
+@return: las apariciones de la palabra en el char text
+*/
+int patternSearch(char* text, char* pattern, vector<pos>& posiciones, int m, int n, int linea, int &cRecalculos) {
     // int m = sizeof(pattern) / sizeof(pattern[0]);
     // int n = sizeof(text) / sizeof(text[0]);;
     int apariciones = 0;
@@ -71,16 +94,21 @@ int patternSearch(char* text, char* pattern, vector<pos>& posiciones, int m, int
     for (int i = 1; i <= n - m + 1; i++) {
         if (patternHash == textHash && checkEqual(text, i - 1, i + m - 2, pattern, 0, m - 1)) {
             apariciones++;
-            //posiciones.push_back(createPos(posiciones, linea, i - 1));
+            //posiciones.push_back(createPos(linea, i - 1));
         }
         if (i < n - m + 1) {
             textHash = recalculateHash(text, i - 1, i + m - 1, textHash, m);
+            cRecalculos++;
         }
     }
     return apariciones;
 }
 
-
+/*
+Función para realizar la prueba del algoritmo de búsqueda de free text.
+Abre el archivo "prueba.txt" para buscar cierta palabra en ese archivo.
+@param: string de la palabra que deseamos buscar.
+*/
 void pruebaTextSearch(string palabra){
     ifstream archivo;
     archivo.open("prueba.txt", ios::in); //abrir archivo con el texto
@@ -90,29 +118,32 @@ void pruebaTextSearch(string palabra){
         exit(1);
     }
 
+    //se construye el array de char de la palabra a buscar
     string linea = "";
     char clinea[1000], cpalabra[1000];
     strcpy_s(cpalabra, palabra.c_str());
-    int apariciones = 0, lengthline, lengthpalabra, numline = 1;
+
+    int apariciones = 0, cRecalculos = 0, lengthline, lengthpalabra, numline = 1;
     vector<pos> posiciones1;
 
+    //ciclo que busca todas las apariciones de la palabra en el texto linea por linea
     double t1 = (double)clock() / CLOCKS_PER_SEC;
     while (!archivo.eof()) {
         getline(archivo, linea);
         strcpy_s(clinea, linea.c_str());
         lengthline = linea.length(); lengthpalabra = palabra.length();
-        apariciones += patternSearch(clinea, cpalabra, posiciones1, lengthpalabra, lengthline, numline);
+        apariciones += patternSearch(clinea, cpalabra, posiciones1, lengthpalabra, lengthline, numline, cRecalculos);
         numline++;
     }
     double t2 = (double)clock() / CLOCKS_PER_SEC;
 
     cout << "\nApariciones de " << palabra << " en el texto: " << apariciones << endl;
+    //cout << "Recalculos del valor hash: " << cRecalculos << endl;
     cout << "Tiempo: " << t2-t1 << endl;
     archivo.close();
 }
 
 int main(){
-    //-------------------------------------------------------------------------------------------------------
     cout << "-----------------------------------------------------------------------------" << endl;
 
     ifstream archivo;

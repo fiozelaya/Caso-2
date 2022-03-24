@@ -1,26 +1,28 @@
 /*
 Caso 2
+Quicksort
 
 Fiorella Zelaya Coto
 2021453615
 */
 
 #include <iostream>
-#include <string>
 #include <math.h>
-#include <fstream>
-#include <cstring>
 #include <time.h>
 #include <random>
 
 using namespace std;
 
 //contadores globales
-//quicksort
 long long int swapCount = 0;
 int partitionCount = 0;
 int pivot;
 
+/*
+Función para intercambiar dos elementos mediante la utilización de
+punteros.
+@param: puntero a y puntero b
+*/
 void swap(int* a, int* b)
 {
     int t = *a;
@@ -28,7 +30,12 @@ void swap(int* a, int* b)
     *b = t;
 }
 
-// partition the array using last element as pivot
+/*
+Función de partición del array utilizando el último elemento
+como pivot.
+@param: array, indice del primer elemento, indice del último elemento
+@return: índice del pivot
+*/
 int partition(int arr[], int low, int high)
 {
     int pivot = arr[high];    // pivot 
@@ -51,6 +58,12 @@ int partition(int arr[], int low, int high)
     return (i + 1);
 }
 
+/*
+Función de partición del array utilizando un elemento aleatorio
+como pivot.
+@param: array, indice del primer elemento, indice del último elemento
+@return: índice del pivot que retorna la función partitioning()
+*/
 int partition_r(int arr[], int low, int high)
 {
     // Generate a random number in between
@@ -79,6 +92,12 @@ int partition_r(int arr[], int low, int high)
 //    }
 //}
 
+
+/*
+Función quicksort iterativa utilizando el ultimo elemento del array
+como pivot.
+@param: array, indice del primer elemento, indice del ultimo elemento
+*/
 void quickSort(int arr[], int l, int h)
 {
     // Create an auxiliary stack
@@ -120,7 +139,10 @@ void quickSort(int arr[], int l, int h)
     }
 }
 
-
+/*
+Función quicksort iterativa utilizando un pivot random
+@param: array, indice del primer elemento, indice del ultimo elemento
+*/
 void quickSort_r(int arr[], int l, int h, int pivote)
 {
     // Create an auxiliary stack
@@ -162,6 +184,10 @@ void quickSort_r(int arr[], int l, int h, int pivote)
     }
 }
 
+/*
+Función que llena un array dependiendo del parámetro sign.
+@param: array, tamaño del array y sign (0, desordenado; 1, ordenado ascendentemente; 2, ordenado descendentemente)
+*/
 void fill(int arr[], int size, int sign) {
     for (int i = 0; i < size; i++) {
         switch (sign) {
@@ -177,7 +203,11 @@ void fill(int arr[], int size, int sign) {
     }
 }
 
-
+/*
+Función para hacer pruebas del funcionamiento del quicksort utilizando el
+último elemento como pivot.
+@param: tamaño del array, sign (0, 1 o 2)
+*/
 void pruebaQuicksort(int size, int sign){
     int vector[size];
     fill(vector, size, sign);
@@ -190,6 +220,11 @@ void pruebaQuicksort(int size, int sign){
     cout << "Tiempo: " << (qt2 - qt1) << "\nSwaps: " << swapCount << "\nParticiones: " << partitionCount /*<< "Tasa de crecimiento: " << ((((qt2 - qt1))-tasa)/tasa)*100*/ << endl;
 }
 
+/*
+Función para hacer pruebas del funcionamiento del quicksort utilizando un
+pivot aleatorio
+@param: tamaño del array, sign (0, 1 o 2)
+*/
 void pruebaQuicksort_r(int size, int sign, int pivote){
     int vector[size];
     fill(vector, size, sign);
@@ -203,7 +238,7 @@ void pruebaQuicksort_r(int size, int sign, int pivote){
 }
 
 int main() {
-
+    cout << "-----------------------------------------------------------------------------" << endl;
     cout << "Ejercicio 1: Quicksort" << endl;
     cout << "Pivote fijo: último elemento" << endl;
     cout << "Caso promedio: Los elementos del array están en desorden. Tiene una complejidad en el tiempo de O(n log n)" << endl;
